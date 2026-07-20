@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% from "components/_timetable_week.html" import timetable_week %}
+{% block title %}Timetable — UltraEdu{% endblock %}
+{% block content %}
+<h1>Your Weekly Timetable</h1>
+<p class="muted">Monday to Friday, across all your classes.</p>
+{{ timetable_week(periods, grid, day_names) }}
+{% endblock %}

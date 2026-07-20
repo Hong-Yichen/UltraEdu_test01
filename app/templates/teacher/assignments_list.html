@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Assignments — UltraEdu{% endblock %}
+{% block content %}
+<h1>Assignments</h1>
+<p><a href="{{ url_for('teacher.assignments_new') }}" class="btn-primary btn-inline">New assignment</a></p>
+{% if assignments %}
+<table class="simple-table">
+  <thead><tr><th>Title</th><th>Class</th><th>Difficulty</th><th>Status</th><th>Due</th></tr></thead>
+  <tbody>
+    {% for a in assignments %}
+    <tr>
+      <td><a href="{{ url_for('teacher.assignment_detail', assignment_id=a.id) }}">{{ a.title }}</a></td>
+      <td>{{ a.class_group.name }}</td>
+      <td>{{ a.difficulty|label }}</td>
+      <td>{{ 'Published' if a.is_published else 'Draft' }}</td>
+      <td>{{ a.due_date.strftime('%d %b %Y') if a.due_date else '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No assignments yet.</p>
+{% endif %}
+{% endblock %}

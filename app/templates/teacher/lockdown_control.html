@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Lockdown — {{ class_group.name }} — UltraEdu{% endblock %}
+{% block content %}
+<h1>Classroom Lockdown — {{ class_group.name }}</h1>
+<p class="muted">While active, students in this class can only access {{ class_group.subject.name }} assignments and the resources you choose below.</p>
+
+{% if active %}
+<div class="card">
+  <p><strong>Lockdown is active</strong> — started {{ active.started_at.strftime('%d %b %Y %H:%M') }}.</p>
+  <form method="post" action="{{ url_for('teacher.lockdown_deactivate', class_group_id=class_group.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn-danger">End Lockdown</button>
+  </form>
+</div>
+{% else %}
+<form method="post" action="{{ url_for('teacher.lockdown_activate', class_group_id=class_group.id) }}" class="form-card">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="field">
+    <label>Allowed resources ({{ class_group.subject.name }})</label>
+    {% if resources %}
+    {% for r in resources %}
+    <div class="field-inline">
+      <input type="checkbox" id="res-{{ r.id }}" name="resource_ids" value="{{ r.id }}">
+      <label for="res-{{ r.id }}">{{ r.title }} ({{ r.resource_type|label }})</label>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="muted">No resources for this subject yet.</p>
+    {% endif %}
+  </div>
+  <button type="submit" class="btn-primary">Activate Lockdown</button>
+</form>
+{% endif %}
+{% endblock %}

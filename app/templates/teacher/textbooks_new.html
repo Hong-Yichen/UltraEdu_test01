@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Upload Textbook — UltraEdu{% endblock %}
+{% block content %}
+<h1>Upload Textbook</h1>
+<form method="post" enctype="multipart/form-data" class="form-card">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="field">
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" required>
+  </div>
+  <div class="field">
+    <label for="subject_id">Subject</label>
+    <select id="subject_id" name="subject_id" required>
+      {% for s in subjects %}
+      <option value="{{ s.id }}">{{ s.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="class_group_id">Class (optional — leave blank to share with all your classes for this subject)</label>
+    <select id="class_group_id" name="class_group_id">
+      <option value="">— All classes —</option>
+      {% for c in classes %}
+      <option value="{{ c.id }}">{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="description">Description</label>
+    <textarea id="description" name="description" rows="3"></textarea>
+  </div>
+  <div class="field">
+    <label for="file">Textbook file (PDF recommended)</label>
+    <input type="file" id="file" name="file" accept="application/pdf" required>
+  </div>
+  <div class="field">
+    <label for="cover_image">Cover image (optional)</label>
+    <input type="file" id="cover_image" name="cover_image" accept="image/*">
+  </div>
+  <button type="submit" class="btn-primary">Upload</button>
+</form>
+{% endblock %}

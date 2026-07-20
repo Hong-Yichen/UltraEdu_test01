@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Model Answers — {{ assignment.title }} — UltraEdu{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/worksheet.css') }}">
+{% endblock %}
+{% block content %}
+<h1>Model Answers — {{ assignment.title }}</h1>
+<p class="muted">Set the ideal answer for each question. Students never see this — it's shown to you while grading.</p>
+
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% for element in assignment.worksheet.elements|sort(attribute='order_index') %}
+  {% set model_answer = model_answers_by_element.get(element.id) %}
+  <div class="card">
+    <h2>{{ element.element_type|label }} · {{ element.points }} pt{{ '' if element.points == 1 else 's' }}</h2>
+    <p>{{ element.prompt_text }}</p>
+
+    {% if element.element_type in ('drawing_area', 'handwriting_area', 'fill_blank', 'label_diagram') and model_answer and model_answer.canvas_document_id %}
+    <div class="ws-canvas-mount"
+      data-canvas-mount
+      data-document-id="{{ model_answer.canvas_document_id }}"
+      data-canvas-mode="edit"
+      data-width="{{ element.width - 20 }}"
+      data-height="{{ element.height - 40 }}"
+    ></div>
+    {% endif %}
+
+    <div class="field">
+      <label for="text_notes_{{ element.id }}">Notes for the teacher (marking guidance)</label>
+      <textarea id="text_notes_{{ element.id }}" name="text_notes_{{ element.id }}" rows="2">{{ model_answer.text_notes if model_answer else '' }}</textarea>
+    </div>
+  </div>
+  {% endfor %}
+  <button type="submit" class="btn-primary">Save model answers</button>
+</form>
+{% endblock %}
+{% block extra_js %}
+<script>window.CSRF_TOKEN = "{{ csrf_token() }}";</script>
+<script src="{{ url_for('static', filename='js/canvas.js') }}"></script>
+<script>
+  document.querySelectorAll('[data-canvas-mount]').forEach(function (mount) {
+    UltraEduCanvas.mount(mount, {
+      documentId: Number(mount.dataset.documentId),
+      mode: mount.dataset.canvasMode,
+      width: Number(mount.dataset.width),
+      height: Number(mount.dataset.height)
+    });
+  });
+</script>
+{% endblock %}

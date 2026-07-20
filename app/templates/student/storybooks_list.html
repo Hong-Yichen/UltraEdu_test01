@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Storybooks — UltraEdu{% endblock %}
+{% block content %}
+<h1>Storybooks</h1>
+{% if storybooks %}
+<div class="card-grid">
+  {% for s in storybooks %}
+  <div class="card">
+    <h2><a href="{{ url_for('student.storybook_detail', storybook_id=s.id) }}">{{ s.title }}</a></h2>
+    <p class="muted">{{ s.language|label }} · {{ s.subject.name }}</p>
+    {% if s.description %}<p>{{ s.description }}</p>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p class="muted">No storybooks available yet.</p>
+{% endif %}
+{% endblock %}

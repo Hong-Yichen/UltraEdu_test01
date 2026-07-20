@@ -1,0 +1,20 @@
+{% macro group_chat(group) %}
+<div class="card">
+  <h2>Team Chat{% if current_user.is_teacher %} — {{ group.name }}{% endif %}</h2>
+  <p class="muted">
+    {% if current_user.is_teacher %}
+      You can see and reply to this group's chat here.
+    {% else %}
+      Message the team about this project — your teacher can see and reply here too.
+    {% endif %}
+  </p>
+  <div data-group-chat-root class="chat-shell chat-shell-compact" data-group-id="{{ group.id }}" data-current-user-id="{{ current_user.id }}">
+    <p class="group-chat-closed-notice muted" hidden style="margin:0.6rem 0.9rem 0;"><strong>This chat is closed — the assignment's due date has passed.</strong></p>
+    <div class="group-chat-messages chat-messages"></div>
+    <form class="group-chat-form chat-form">
+      <textarea class="group-chat-input" placeholder="Message the team…" required></textarea>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+</div>
+{% endmacro %}

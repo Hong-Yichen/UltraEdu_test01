@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Assignments — UltraEdu{% endblock %}
+{% block content %}
+<h1>Assignments</h1>
+{% if assignments %}
+<table class="simple-table">
+  <thead><tr><th>Title</th><th>Difficulty</th><th>Status</th><th>Due</th></tr></thead>
+  <tbody>
+    {% for a in assignments %}
+    {% set submission = submission_by_assignment.get(a.id) %}
+    <tr>
+      <td><a href="{{ url_for('student.assignment_detail', assignment_id=a.id) }}">{{ a.title }}</a></td>
+      <td>{{ a.difficulty|label }}</td>
+      <td>{{ submission.status|label if submission else 'Not Started' }}</td>
+      <td>{{ a.due_date.strftime('%d %b %Y') if a.due_date else '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No assignments yet.</p>
+{% endif %}
+{% endblock %}

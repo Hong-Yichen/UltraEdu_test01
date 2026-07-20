@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Bookmarks — UltraEdu{% endblock %}
+{% block content %}
+<h1>Bookmarks</h1>
+{% if bookmarks %}
+<table class="simple-table">
+  <thead><tr><th>Item</th><th>Type</th><th>Subject</th></tr></thead>
+  <tbody>
+    {% for b in bookmarks %}
+    <tr>
+      <td>
+        {% if b.assignment %}<a href="{{ url_for('student.assignment_detail', assignment_id=b.assignment.id) }}">{{ b.assignment.title }}</a>
+        {% elif b.resource %}<a href="{{ url_for('api.serve_upload', relative_path=b.resource.file_path) }}" target="_blank">{{ b.resource.title }}</a>
+        {% elif b.storybook %}<a href="{{ url_for('student.storybook_detail', storybook_id=b.storybook.id) }}">{{ b.storybook.title }}</a>
+        {% endif %}
+      </td>
+      <td>{{ 'Assignment' if b.assignment else ('Resource' if b.resource else 'Storybook') }}</td>
+      <td>{{ b.subject.name }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No bookmarks yet.</p>
+{% endif %}
+{% endblock %}

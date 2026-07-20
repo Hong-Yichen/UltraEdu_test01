@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}{{ storybook.title }} — UltraEdu{% endblock %}
+{% block content %}
+<h1>{{ storybook.title }}</h1>
+<p class="muted">{{ storybook.language|label }} · {{ storybook.subject.name }}</p>
+
+<div class="card">
+  <h2>Pages</h2>
+  {% if storybook.pages %}
+  <ol>
+    {% for p in storybook.pages %}
+    <li>{{ p.text_content }}{% if p.image_path %} <em>(has image)</em>{% endif %}</li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="muted">No pages yet.</p>
+  {% endif %}
+  <form method="post" enctype="multipart/form-data" class="form-card">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field">
+      <label for="text_content">Page text</label>
+      <textarea id="text_content" name="text_content" rows="4" required></textarea>
+    </div>
+    <div class="field">
+      <label for="image">Image (optional)</label>
+      <input type="file" id="image" name="image" accept="image/*">
+    </div>
+    <button type="submit" class="btn-primary">Add page</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Activities</h2>
+  <p class="muted">Optionally link a worksheet for comprehension/vocab activities (built in Worksheets).</p>
+  <form method="post" action="{{ url_for('teacher.storybook_link_worksheet', storybook_id=storybook.id) }}" class="form-card">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field">
+      <label for="worksheet_id">Worksheet</label>
+      <select id="worksheet_id" name="worksheet_id">
+        <option value="">— None —</option>
+        {% for w in worksheets %}
+        <option value="{{ w.id }}" {% if storybook.worksheet_id == w.id %}selected{% endif %}>{{ w.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="ai_mode">AI hints for activities</label>
+      <select id="ai_mode" name="ai_mode">
+        {% for m in ai_modes %}
+        <option value="{{ m }}" {% if storybook.ai_mode == m %}selected{% endif %}>{{ m|label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn-primary">Save</button>
+  </form>
+  {% if not worksheets %}
+  <p class="muted">No worksheets for this subject yet — <a href="{{ url_for('teacher.worksheets_new') }}">create one</a>.</p>
+  {% endif %}
+</div>
+{% endblock %}

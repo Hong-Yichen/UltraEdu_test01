@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "components/_group_chat.html" import group_chat with context %}
+{% block title %}Groups — {{ assignment.title }} — UltraEdu{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+{% endblock %}
+{% block content %}
+<h1>Groups — {{ assignment.title }}</h1>
+
+<form method="post" class="form-card">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="field">
+    <label for="name">New group name</label>
+    <input type="text" id="name" name="name" required>
+  </div>
+  {% if unassigned %}
+  <div class="field">
+    <label>Who's working together?</label>
+    {% for s in unassigned %}
+    <div class="field-inline">
+      <input type="checkbox" id="new-group-student-{{ s.id }}" name="student_ids" value="{{ s.id }}">
+      <label for="new-group-student-{{ s.id }}">{{ s.full_name }}</label>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted">Every enrolled student is already in a group.</p>
+  {% endif %}
+  <button type="submit" class="btn-primary">Create group</button>
+</form>
+
+{% for group in groups %}
+<div class="card">
+  <h2>{{ group.name }}</h2>
+  {% if group.memberships %}
+  <ul class="plain-list">
+    {% for m in group.memberships %}
+    <li>{{ m.student.full_name }}{% if m.is_leader %} <span class="muted">(leader)</span>{% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">No members yet.</p>
+  {% endif %}
+  {% if unassigned %}
+  <form method="post" action="{{ url_for('teacher.group_add_member', assignment_id=assignment.id, group_id=group.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <select name="student_id">
+      {% for s in unassigned %}
+      <option value="{{ s.id }}">{{ s.full_name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn-primary btn-inline">Add</button>
+  </form>
+  {% endif %}
+</div>
+{{ group_chat(group) }}
+{% endfor %}
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/group_chat.js') }}"></script>
+{% endblock %}

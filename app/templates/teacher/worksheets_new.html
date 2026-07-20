@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}New Worksheet — UltraEdu{% endblock %}
+{% block content %}
+<h1>New Worksheet</h1>
+<form method="post" class="form-card">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="field">
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" required>
+  </div>
+  <div class="field">
+    <label for="subject_id">Subject</label>
+    <select id="subject_id" name="subject_id" required>
+      {% for s in subjects %}
+      <option value="{{ s.id }}">{{ s.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit" class="btn-primary">Create &amp; open builder</button>
+</form>
+{% endblock %}

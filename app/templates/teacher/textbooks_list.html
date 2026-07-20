@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Textbooks — UltraEdu{% endblock %}
+{% block content %}
+<h1>Textbooks</h1>
+<p><a href="{{ url_for('teacher.textbooks_new') }}" class="btn-primary btn-inline">Upload textbook</a></p>
+{% if textbooks %}
+<table class="simple-table">
+  <thead><tr><th>Title</th><th>Subject</th><th>Visibility</th><th>Status</th><th>Uploaded</th><th></th></tr></thead>
+  <tbody>
+    {% for t in textbooks %}
+    <tr>
+      <td>{{ t.title }}</td>
+      <td>{{ t.subject.name }}</td>
+      <td>{{ t.class_group.name if t.class_group else 'All classes' }}</td>
+      <td>
+        {% if t.is_published %}
+        <span class="status-badge status-graded">Published</span>
+        {% else %}
+        <span class="status-badge status-not_started">Draft</span>
+        {% endif %}
+      </td>
+      <td>{{ t.created_at.strftime('%d %b %Y') }}</td>
+      <td>
+        <a href="{{ url_for('api.serve_upload', relative_path=t.file_path) }}" target="_blank">View</a>
+        ·
+        {% if t.is_published %}
+        <form method="post" action="{{ url_for('teacher.textbook_unpublish', textbook_id=t.id) }}" style="display:inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="link-button">Unpublish</button>
+        </form>
+        {% else %}
+        <form method="post" action="{{ url_for('teacher.textbook_publish', textbook_id=t.id) }}" style="display:inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="link-button">Publish</button>
+        </form>
+        {% endif %}
+        ·
+        <form method="post" action="{{ url_for('teacher.textbook_delete', textbook_id=t.id) }}"
+              onsubmit="return confirm('Remove this textbook? Student notes on it will also be deleted.');" style="display:inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="link-button">Remove</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No textbooks uploaded yet.</p>
+{% endif %}
+{% endblock %}

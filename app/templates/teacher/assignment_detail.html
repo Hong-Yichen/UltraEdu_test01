@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ assignment.title }} — UltraEdu{% endblock %}
+{% block content %}
+<h1>{{ assignment.title }}</h1>
+<p class="muted">
+  {{ assignment.class_group.name }} · {{ assignment.difficulty|label }} ·
+  {{ 'Published' if assignment.is_published else 'Draft' }} ·
+  Due {{ assignment.due_date.strftime('%d %b %Y %H:%M') if assignment.due_date else 'no due date' }}
+</p>
+{% if assignment.description %}<p>{{ assignment.description }}</p>{% endif %}
+<p>
+  <a href="{{ url_for('teacher.assignment_groups', assignment_id=assignment.id) }}">Groups</a> ·
+  <a href="{{ url_for('teacher.assignment_analytics', assignment_id=assignment.id) }}">Analytics</a>
+  {% if assignment.worksheet %}
+  · <a href="{{ url_for('teacher.assignment_model_answers', assignment_id=assignment.id) }}">Model answers</a>
+  {% endif %}
+</p>
+
+{% if not assignment.is_published %}
+<form method="post" action="{{ url_for('teacher.assignment_publish', assignment_id=assignment.id) }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button type="submit" class="btn-primary btn-inline">Publish &amp; notify class</button>
+</form>
+{% else %}
+<form method="post" action="{{ url_for('teacher.assignment_recall', assignment_id=assignment.id) }}"
+      onsubmit="return confirm('Recall this assignment? Students will no longer be able to see or open it until you publish it again.');">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button type="submit" class="btn-danger btn-inline">Recall assignment</button>
+</form>
+{% endif %}
+
+<div class="card">
+  <h2>
+    Submissions ({{ submissions|length }} / {{ total_students }})
+    {% set to_grade_count = submissions|selectattr('status', 'equalto', 'submitted')|list|length %}
+    {% if to_grade_count %}<span class="status-badge status-submitted" style="margin-left: 0.5rem;">{{ to_grade_count }} to grade</span>{% endif %}
+  </h2>
+  {% if submissions %}
+  <table class="simple-table">
+    <thead><tr><th>Student</th><th>Status</th><th>Submitted</th><th>Score</th><th></th></tr></thead>
+    <tbody>
+      {% for s in submissions %}
+      <tr>
+        <td>{{ s.student.full_name if s.student else '—' }}</td>
+        <td><span class="status-badge status-{{ s.status }}">{{ s.status|label }}</span></td>
+        <td>{{ s.submitted_at.strftime('%d %b %Y %H:%M') if s.submitted_at else '—' }}</td>
+        <td>{{ s.score if s.score is not none else '—' }} / {{ s.max_score }}</td>
+        <td>
+          {% if s.status in ('submitted', 'graded', 'returned', 'needs_revision') %}
+          <a href="{{ url_for('teacher.grade_submission', submission_id=s.id) }}">
+            {{ 'Grade' if s.status == 'submitted' else 'View grade' }}
+          </a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No submissions yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

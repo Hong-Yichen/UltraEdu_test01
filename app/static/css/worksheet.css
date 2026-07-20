@@ -1,0 +1,95 @@
+.worksheet-page {
+  position: relative;
+  background: #fffdf7;
+  border: 1px solid var(--border, #ddd6c4);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  margin: 0 auto 2rem;
+  padding: 40px;
+  box-sizing: border-box;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 27px,
+    #e3ddc8 28px
+  );
+}
+
+/* Take/grade/readonly rendering uses normal document flow (stacked, in order_index
+   order) so an element that needs more room than its stored height never overlaps
+   the next question. Only the builder's drag-and-drop canvas (.editable below)
+   still needs free-form absolute positioning. */
+.ws-element {
+  position: relative;
+  border: 1px dashed transparent;
+  padding: 6px 8px 6px 0;
+  margin: 0 0 20px;
+  box-sizing: border-box;
+}
+.ws-element.editable {
+  position: absolute;
+  cursor: move;
+  padding: 6px 8px;
+  margin: 0;
+  border-color: #c9c0a0;
+  background: rgba(255,255,255,0.55);
+}
+.ws-element.editable.selected { border-color: var(--accent, #3f6f5f); border-style: solid; }
+.ws-element .ws-prompt { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #333; }
+.ws-element .ws-type-badge {
+  position: absolute; top: 2px; right: 4px; font-size: 0.65rem; color: #999;
+  text-transform: uppercase; letter-spacing: 0.02em;
+}
+.ws-element .ws-points { font-size: 0.7rem; color: #888; }
+
+.ws-mcq-option { display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; margin-bottom: 2px; }
+.ws-drawing-hint, .ws-handwriting-hint { color: #aaa; font-size: 0.8rem; font-style: italic; }
+.ws-write-hint { margin: 0 0 4px; font-size: 0.75rem; }
+.correct-tag { color: #2c5e2f; font-weight: 600; margin-left: 0.3rem; }
+.ws-model-answer {
+  margin-top: 6px; font-size: 0.82rem; background: #eef7f0; border: 1px solid #cfe8d4;
+  border-radius: 6px; padding: 4px 8px;
+}
+.ws-model-answer summary { cursor: pointer; font-weight: 600; color: #2c5e2f; }
+.ws-model-answer p { margin: 6px 0; }
+.ws-highlight-passage { font-size: 0.85rem; line-height: 1.5; }
+.ws-sentence { cursor: pointer; }
+.ws-sentence.highlighted { background: #fff3b0; }
+.ws-canvas-mount { margin-top: 4px; }
+
+.ws-ai-hint { margin: 4px 0; }
+.ws-ai-hint-btn {
+  font-size: 0.75rem; padding: 2px 8px; border: 1px solid var(--border, #ddd6c4);
+  background: #f6f2e6; border-radius: 999px; cursor: pointer;
+}
+.ws-ai-hint-btn:hover { background: #efe8d4; }
+.ws-ai-hint-text {
+  font-size: 0.8rem; color: #5a4a2a; background: #fdf6e3; border: 1px solid #e8dcb0;
+  border-radius: 6px; padding: 4px 8px; margin-top: 4px;
+}
+
+/* Builder layout */
+.builder-layout { display: flex; gap: 1.5rem; align-items: flex-start; }
+.builder-toolbox {
+  width: 220px; flex-shrink: 0; background: var(--paper); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1rem; position: sticky; top: 1rem;
+}
+.builder-toolbox h3 { margin-top: 0; font-size: 0.95rem; }
+.builder-toolbox button {
+  display: block; width: 100%; text-align: left; padding: 0.45rem 0.6rem; margin-bottom: 0.4rem;
+  border: 1px solid var(--border); background: white; border-radius: 6px; cursor: pointer; font-size: 0.85rem;
+}
+.builder-toolbox button:hover { background: #f1f6f2; }
+.builder-canvas-wrap { flex: 1; overflow-x: auto; }
+.builder-inspector {
+  width: 280px; flex-shrink: 0; background: var(--paper); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1rem; position: sticky; top: 1rem;
+}
+.builder-inspector .field { margin-bottom: 0.8rem; }
+.builder-inspector label { display: block; font-size: 0.8rem; color: #444; margin-bottom: 0.2rem; }
+.builder-inspector input, .builder-inspector textarea {
+  width: 100%; padding: 0.4rem 0.5rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem;
+}
+.builder-inspector textarea { font-family: monospace; }
+.builder-inspector .btn-danger {
+  background: #b3403a; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer;
+}

@@ -1,0 +1,102 @@
+.uec-container {
+  position: relative;
+  background: #fffdf7;
+  border: 1px solid var(--border, #ddd6c4);
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 27px,
+    #e3ddc8 28px
+  );
+}
+.uec-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.uec-layer-base { z-index: 1; }
+.uec-layer-annotation { z-index: 2; }
+
+.uec-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+.uec-tool-btn {
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border, #ddd6c4);
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.uec-tool-btn.active {
+  background: var(--accent, #3f6f5f);
+  color: white;
+  border-color: var(--accent, #3f6f5f);
+}
+.uec-color { width: 34px; height: 30px; padding: 0; border: 1px solid var(--border, #ddd6c4); border-radius: 6px; }
+.uec-width { width: 100px; }
+.uec-save {
+  margin-left: auto;
+  padding: 0.35rem 0.9rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent, #3f6f5f);
+  color: white;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.uec-save:hover { background: var(--accent-dark, #2c4f43); }
+
+.uec-sticky-note {
+  position: absolute;
+  z-index: 4;
+  padding: 6px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  font-size: 0.8rem;
+  line-height: 1.3;
+  white-space: pre-wrap;
+  word-break: break-word;
+  transform: rotate(-1deg);
+}
+.uec-sticky-editor {
+  position: absolute;
+  z-index: 5;
+  background: #fff3b0;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+  padding: 6px;
+  width: 180px;
+}
+.uec-sticky-editor textarea {
+  width: 100%;
+  min-height: 70px;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  padding: 4px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.uec-sticky-editor-actions {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+}
+.uec-sticky-editor-actions button {
+  flex: 1;
+  border: none;
+  border-radius: 3px;
+  padding: 0.25rem 0.4rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.uec-sticky-editor-actions button:first-child { background: var(--accent, #3f6f5f); color: white; }
+.uec-sticky-editor-actions button:last-child { background: #eee; }

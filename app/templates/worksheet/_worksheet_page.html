@@ -1,0 +1,108 @@
+{% macro render_worksheet(worksheet, answers_by_element, mode, ai_enabled=False, assignment_id=None, storybook_id=None, model_answers_by_element={}) %}
+{# mode: 'take' (student, editable) | 'grade' (teacher, overlay canvas + correctness) | 'readonly' (submitted, view only) #}
+{% for page in range(1, worksheet.page_count + 1) %}
+<div class="worksheet-page" style="width:{{ worksheet.page_width }}px;min-height:{{ worksheet.page_height }}px;">
+  {% for el in worksheet.elements if el.page_number == page %}
+  {% set answer = answers_by_element.get(el.id) %}
+  {% set model_answer = model_answers_by_element.get(el.id) %}
+  <div class="ws-element" style="max-width:{{ el.width }}px;">
+    <span class="ws-type-badge">{{ el.element_type|label }} · {{ el.points }} pt{{ '' if el.points == 1 else 's' }}</span>
+    <div class="ws-prompt">{{ el.prompt_text }}</div>
+    {% if ai_enabled and mode == 'take' %}
+    <div class="ws-ai-hint" data-ai-hint
+      {% if assignment_id %}data-assignment-id="{{ assignment_id }}"{% endif %}
+      {% if storybook_id %}data-storybook-id="{{ storybook_id }}"{% endif %}
+      data-element-id="{{ el.id }}">
+      <button type="button" class="ws-ai-hint-btn">🤖 Get a hint</button>
+      <div class="ws-ai-hint-text" hidden></div>
+    </div>
+    {% endif %}
+
+    {% if el.element_type == 'multiple_choice' %}
+      {% set selected = answer.answer_json.selected_option_id if answer and answer.answer_json else None %}
+      {% for opt in el.config_json.get('options', []) %}
+      <label class="ws-mcq-option">
+        <input type="radio" name="mcq_{{ el.id }}" value="{{ opt.id }}"
+          {% if mode != 'take' %}disabled{% endif %}
+          {% if selected == opt.id %}checked{% endif %}
+          data-answer-field data-element-id="{{ el.id }}" data-kind="mcq">
+        {{ opt.text }}
+        {% if mode == 'grade' and el.config_json.get('correct_option_id') == opt.id %}<strong class="correct-tag">(correct)</strong>{% endif %}
+      </label>
+      {% endfor %}
+
+    {% elif el.element_type == 'matching' %}
+      {% set pairs = (answer.answer_json.pairs if answer and answer.answer_json else {}) or {} %}
+      {% for left in el.config_json.get('left', []) %}
+      <div class="ws-mcq-option">
+        {{ left.text }} →
+        <select name="match_{{ el.id }}_{{ left.id }}" {% if mode != 'take' %}disabled{% endif %}
+          data-answer-field data-element-id="{{ el.id }}" data-kind="matching" data-left-id="{{ left.id }}">
+          <option value="">—</option>
+          {% for right in el.config_json.get('right', []) %}
+          <option value="{{ right.id }}" {% if pairs.get(left.id) == right.id %}selected{% endif %}>{{ right.text }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endfor %}
+
+    {% elif el.element_type == 'text_highlight' %}
+      {% set highlighted = (answer.answer_json.highlighted_sentence_ids if answer and answer.answer_json else []) or [] %}
+      <div class="ws-highlight-passage" data-answer-field data-element-id="{{ el.id }}" data-kind="text_highlight" data-mode="{{ mode }}">
+        {% for sentence in el.config_json.get('passage', '').split('. ') %}
+        {% set sid = 's' ~ loop.index %}
+        <span class="ws-sentence {{ 'highlighted' if sid in highlighted }}" data-sentence-id="{{ sid }}">{{ sentence }}{{ '. ' if not loop.last }}</span>
+        {% endfor %}
+      </div>
+
+    {% elif el.element_type == 'image_upload' %}
+      {% if mode == 'take' %}
+      <input type="file" accept="image/*" data-image-upload data-element-id="{{ el.id }}">
+      {% endif %}
+      {% if answer and answer.image_file_path %}
+      <div><a href="{{ url_for('api.serve_upload', relative_path=answer.image_file_path) }}" target="_blank">View uploaded image</a></div>
+      {% endif %}
+
+    {% elif el.element_type in ('drawing_area', 'handwriting_area', 'fill_blank', 'label_diagram') %}
+      <p class="ws-write-hint muted">✍️ Write your answer by hand below.</p>
+      {% if answer and answer.canvas_document_id %}
+      <div class="ws-canvas-mount"
+        data-canvas-mount
+        data-document-id="{{ answer.canvas_document_id }}"
+        data-canvas-mode="{{ 'overlay' if mode == 'grade' else ('edit' if mode == 'take' else 'readonly') }}"
+        data-width="{{ el.width - 20 }}"
+        data-height="{{ el.height - 40 }}"
+      ></div>
+      {% else %}
+      <div class="muted">No canvas yet.</div>
+      {% endif %}
+      {% if mode == 'grade' and el.element_type == 'fill_blank' and el.config_json.get('correct_text') %}
+      <div class="muted">Correct answer: {{ el.config_json.get('correct_text', '') }}</div>
+      {% elif mode == 'grade' and el.element_type == 'label_diagram' and el.config_json.get('labels') %}
+      <div class="muted">
+        Labels:
+        {% for label in el.config_json.get('labels', []) %}{{ loop.index }}. {{ label.get('text', label.get('id', '')) }}{{ ', ' if not loop.last }}{% endfor %}
+      </div>
+      {% endif %}
+    {% endif %}
+
+    {% if mode == 'grade' and model_answer %}
+    <details class="ws-model-answer">
+      <summary>📘 Model answer</summary>
+      {% if model_answer.text_notes %}<p>{{ model_answer.text_notes }}</p>{% endif %}
+      {% if model_answer.canvas_document_id %}
+      <div class="ws-canvas-mount"
+        data-canvas-mount
+        data-document-id="{{ model_answer.canvas_document_id }}"
+        data-canvas-mode="readonly"
+        data-width="{{ el.width - 20 }}"
+        data-height="{{ (el.height - 40) if el.element_type in ('drawing_area', 'handwriting_area', 'fill_blank', 'label_diagram') else 160 }}"
+      ></div>
+      {% endif %}
+    </details>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endfor %}
+{% endmacro %}

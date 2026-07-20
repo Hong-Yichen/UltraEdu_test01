@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}New Announcement — UltraEdu{% endblock %}
+{% block content %}
+<h1>New Announcement</h1>
+<form method="post" class="form-card">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="field">
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" required>
+  </div>
+  <div class="field">
+    <label for="body">Message</label>
+    <textarea id="body" name="body" rows="4" required></textarea>
+  </div>
+  <div class="field">
+    <label for="announcement_type">Type</label>
+    <select id="announcement_type" name="announcement_type">
+      {% for t in announcement_types %}
+      <option value="{{ t }}">{{ t|label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="class_group_id">Class (optional — leave blank for school-wide)</label>
+    <select id="class_group_id" name="class_group_id">
+      <option value="">— School-wide —</option>
+      {% for c in classes %}
+      <option value="{{ c.id }}">{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit" class="btn-primary">Post</button>
+</form>
+{% endblock %}

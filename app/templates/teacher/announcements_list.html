@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Announcements — UltraEdu{% endblock %}
+{% block content %}
+<h1>Announcements</h1>
+<p><a href="{{ url_for('teacher.announcements_new') }}" class="btn-primary btn-inline">New announcement</a></p>
+{% if announcements %}
+<div class="card-list">
+  {% for a in announcements %}
+  <div class="card">
+    <h2>{{ a.title }}</h2>
+    <p>{{ a.body }}</p>
+    <p class="muted">{{ a.announcement_type|label }} · {{ a.class_group.name if a.class_group else 'All classes' }} · {{ a.created_at.strftime('%d %b %Y %H:%M') }}</p>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p class="muted">No announcements yet.</p>
+{% endif %}
+{% endblock %}

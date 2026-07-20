@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Textbooks — UltraEdu{% endblock %}
+{% block content %}
+<h1>Textbooks</h1>
+{% if textbooks %}
+<div class="card-grid">
+  {% for t in textbooks %}
+  <div class="card accent-sky">
+    <h2><span class="card-icon sky">📘</span> {{ t.title }}</h2>
+    <p class="muted">{{ t.subject.name }}</p>
+    {% if t.description %}<p>{{ t.description }}</p>{% endif %}
+    <a href="{{ url_for('student.textbook_reader', textbook_id=t.id) }}" class="btn-primary btn-inline">Read &amp; take notes</a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p class="muted">No textbooks available yet.</p>
+{% endif %}
+{% endblock %}

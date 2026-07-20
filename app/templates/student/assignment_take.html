@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% from "worksheet/_worksheet_page.html" import render_worksheet %}
+{% block title %}{{ assignment.title }} — UltraEdu{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/worksheet.css') }}">
+{% endblock %}
+{% block content %}
+<h1>{{ assignment.title }}</h1>
+<p class="muted">
+  {{ assignment.difficulty|label }} · {{ assignment.max_score }} points ·
+  Due {{ assignment.due_date.strftime('%d %b %Y %H:%M') if assignment.due_date else 'no due date' }}
+  {% if submission.status != 'in_progress' %} · <strong>{{ submission.status|label }}</strong>{% endif %}
+</p>
+{% if assignment.description %}<p>{{ assignment.description }}</p>{% endif %}
+<p>
+  <button type="button" id="bookmark-toggle" class="link-button"
+    data-subject-id="{{ assignment.subject_id }}" data-assignment-id="{{ assignment.id }}"
+    data-bookmark-id="{{ bookmark.id if bookmark else '' }}">
+    {{ '★ Bookmarked' if bookmark else '☆ Bookmark' }}
+  </button>
+  {% if assignment.is_group_assignment %}
+  · <a href="{{ url_for('student.group_workspace', assignment_id=assignment.id) }}">Group workspace</a>
+  {% endif %}
+</p>
+
+{% if assignment.is_exam and not readonly and assignment.due_date %}
+<div id="exam-timer-card" class="card accent-amber">
+  <h2>⏱️ Time remaining</h2>
+  <p id="exam-timer" class="exam-timer-display" data-due-date="{{ assignment.due_date.isoformat() }}Z">--:--:--</p>
+  <p class="muted">Your work is submitted automatically when the time runs out.</p>
+</div>
+{% endif %}
+
+{% if submission.status == 'needs_revision' %}
+<div class="card accent-coral">
+  <h2>✏️ Corrections needed</h2>
+  <p>Your teacher asked you to make some changes. Your work has been unlocked — make your corrections below, then resubmit.</p>
+  <p class="muted">
+    {% if assignment.due_date %}Resubmit by {{ assignment.due_date.strftime('%d %b %Y %H:%M') }}.{% else %}No due date set.{% endif %}
+  </p>
+</div>
+{% endif %}
+
+<div id="ws-take-root" data-assignment-id="{{ assignment.id }}">
+  {% if assignment.worksheet %}
+    {{ render_worksheet(assignment.worksheet, answers_by_element, 'readonly' if readonly else 'take', ai_enabled=(assignment.ai_mode == 'hints_only'), assignment_id=assignment.id) }}
+  {% else %}
+    <div class="card">
+      <p class="muted">This is a file-upload assignment. (Attach-file UI lands alongside group projects in a later step.)</p>
+    </div>
+  {% endif %}
+</div>
+
+{% if not readonly %}
+<form method="post" action="{{ url_for('student.submit_assignment', assignment_id=assignment.id) }}"
+      onsubmit="return confirm('Submit this assignment? You will not be able to make further changes.');">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button type="submit" class="btn-primary btn-inline">
+    {{ 'Resubmit assignment' if submission.status == 'needs_revision' else 'Submit assignment' }}
+  </button>
+</form>
+{% endif %}
+
+{% if submission.status in ('graded', 'returned', 'needs_revision') and (submission.score is not none or submission.feedback_text or submission.voice_feedback) %}
+<div class="card">
+  <h2>Feedback</h2>
+  {% if submission.score is not none %}<p>Score: {{ submission.score }} / {{ submission.max_score }}</p>{% endif %}
+  {% if submission.feedback_text %}<p>{{ submission.feedback_text }}</p>{% endif %}
+  {% if submission.voice_feedback and submission.voice_feedback.audio_file_path %}
+  <p><strong>Voice feedback:</strong></p>
+  <audio controls src="{{ url_for('api.serve_upload', relative_path=submission.voice_feedback.audio_file_path) }}" style="width:100%;"></audio>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+{% block extra_js %}
+<script>window.CSRF_TOKEN = "{{ csrf_token() }}";</script>
+<script src="{{ url_for('static', filename='js/canvas.js') }}"></script>
+<script src="{{ url_for('static', filename='js/autosave.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bookmark_toggle.js') }}"></script>
+<script src="{{ url_for('static', filename='js/exam_timer.js') }}"></script>
+{% endblock %}

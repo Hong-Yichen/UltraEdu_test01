@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Analytics — {{ class_group.name }} — UltraEdu{% endblock %}
+{% block content %}
+<h1>Analytics — {{ class_group.name }}</h1>
+
+<div class="card-grid">
+  <div class="card"><h2>Class average</h2><p>{{ class_average if class_average is not none else '—' }}%</p></div>
+  <div class="card"><h2>Completion rate</h2><p>{{ completion_rate if completion_rate is not none else '—' }}%</p></div>
+</div>
+
+<div class="card">
+  <h2>Students</h2>
+  <table class="simple-table">
+    <thead><tr><th>Student</th><th>Average</th><th>Completed</th><th>Support?</th></tr></thead>
+    <tbody>
+      {% for row in per_student %}
+      <tr>
+        <td>{{ row.student.full_name }}</td>
+        <td>{{ row.average if row.average is not none else '—' }}%</td>
+        <td>{{ row.completed }} / {{ row.total }}</td>
+        <td>{{ '⚠️ Needs support' if row.needs_support else '' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
