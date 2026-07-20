@@ -1,4 +1,5 @@
 import os
+import shutil
 import wave
 from datetime import time, datetime, timedelta, timezone
 
@@ -23,7 +24,6 @@ from app.models.group_collab import (
     GroupMessage,
 )
 from app.services import canvas_service
-from app.pdf_generators import generate_p5_science_pdf
 
 
 def run_seed():
@@ -738,12 +738,16 @@ def run_seed():
     # --- Example textbook: an original Primary 5 Science coursebook (generated for
     # UltraEdu, no copyrighted material) with pre-made handwriting, a highlight, an
     # underline, a shape, and a sticky note on the Chapter 1 page, plus one example note.
-    # The PDF itself is generated right here (not a pre-existing uploaded file), so
-    # `flask seed` produces a working textbook in any environment. ---
+    # The PDF itself is committed at app/static/sample_content/ (see app/pdf_generators.py
+    # for how it was produced) and copied into place here, so `flask seed` always has a
+    # real file to point at, in any environment, with no runtime PDF-generation step.
     sci_textbook_dir = os.path.join(current_app.config["UPLOAD_FOLDER"], "SCI")
     os.makedirs(sci_textbook_dir, exist_ok=True)
     sci_textbook_filename = "p5_science_coursebook.pdf"
-    generate_p5_science_pdf(os.path.join(sci_textbook_dir, sci_textbook_filename))
+    sci_textbook_source = os.path.join(
+        current_app.root_path, "static", "sample_content", "p5_science_coursebook.pdf"
+    )
+    shutil.copyfile(sci_textbook_source, os.path.join(sci_textbook_dir, sci_textbook_filename))
 
     sci_textbook = Textbook(
         title="Primary 5 Science Coursebook",

@@ -1,8 +1,14 @@
-"""Generates original, non-copyrighted PDF content used by seed.py.
+"""Generates the original, non-copyrighted Primary 5 Science coursebook PDF
+used as demo content.
 
-Run at seed time (not committed as a binary) so `flask seed` produces a working
-demo in any environment -- a fresh clone, a Codespace, another machine -- without
-depending on a file that only ever existed on one developer's disk.
+This is a standalone dev tool, not a runtime dependency -- its output is
+committed at app/static/sample_content/p5_science_coursebook.pdf and seed.py
+just copies that file into place, so `flask seed` never needs reportlab
+installed. Re-run this module (requires `pip install reportlab` separately)
+only if you want to regenerate/tweak the PDF's content:
+
+    python -c "from app.pdf_generators import generate_p5_science_pdf as g; \
+        g('app/static/sample_content/p5_science_coursebook.pdf')"
 """
 import math
 import random
