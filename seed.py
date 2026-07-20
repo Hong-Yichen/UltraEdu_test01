@@ -23,6 +23,7 @@ from app.models.group_collab import (
     GroupMessage,
 )
 from app.services import canvas_service
+from app.pdf_generators import generate_p5_science_pdf
 
 
 def run_seed():
@@ -736,13 +737,20 @@ def run_seed():
 
     # --- Example textbook: an original Primary 5 Science coursebook (generated for
     # UltraEdu, no copyrighted material) with pre-made handwriting, a highlight, an
-    # underline, a shape, and a sticky note on the Chapter 1 page, plus one example note. ---
+    # underline, a shape, and a sticky note on the Chapter 1 page, plus one example note.
+    # The PDF itself is generated right here (not a pre-existing uploaded file), so
+    # `flask seed` produces a working textbook in any environment. ---
+    sci_textbook_dir = os.path.join(current_app.config["UPLOAD_FOLDER"], "SCI")
+    os.makedirs(sci_textbook_dir, exist_ok=True)
+    sci_textbook_filename = "p5_science_coursebook.pdf"
+    generate_p5_science_pdf(os.path.join(sci_textbook_dir, sci_textbook_filename))
+
     sci_textbook = Textbook(
         title="Primary 5 Science Coursebook",
         description="An 8-chapter Primary 5 Science coursebook — practice reading, then mark it up right on the page.",
         subject_id=subjects["SCI"].id,
         class_group_id=class_groups_by_code["SCI"].id,
-        file_path="SCI/9f3c7a2b1e4d4f6a8b0c2d5e7f9a1b3c_p5_science_coursebook.pdf",
+        file_path=f"SCI/{sci_textbook_filename}",
         uploaded_by=other_teacher.id,
         published_at=datetime.now(timezone.utc),
     )
