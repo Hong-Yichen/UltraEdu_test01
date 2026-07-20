@@ -36,6 +36,22 @@ Flask + SQLAlchemy + vanilla JS (no frontend framework, no build step).
 - Voice feedback recording/playback (DB field stub only, no recording UI)
 - Offline/PWA sync and video hosting
 
+## Try it in your browser with GitHub Codespaces
+
+No local install needed — on the repo's GitHub page, click **Code → Codespaces → Create
+codespace**. It provisions a container and installs dependencies automatically
+(`.devcontainer/devcontainer.json`). Once it's ready, open a terminal in the codespace and run:
+
+```bash
+export FLASK_APP=wsgi.py
+flask seed
+flask run --host=0.0.0.0
+```
+
+Codespaces will pop up a "forwarded port" notification/toast for port 5000 — click it (or
+open the **Ports** tab) to load the app in a new browser tab. Use `--host=0.0.0.0` (not the
+default `127.0.0.1`) so the forwarded port can actually reach the dev server.
+
 ## Setup
 
 ```bash
