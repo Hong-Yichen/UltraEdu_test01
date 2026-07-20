@@ -97,6 +97,14 @@ def textbooks_new():
     return render_template("teacher/textbooks_new.html", subjects=subjects, classes=classes)
 
 
+@teacher_bp.route("/textbooks/<int:textbook_id>/preview")
+@login_required
+@role_required("teacher")
+def textbook_preview(textbook_id):
+    textbook = _get_owned_textbook(textbook_id)
+    return render_template("teacher/textbook_preview.html", textbook=textbook)
+
+
 @teacher_bp.route("/textbooks/<int:textbook_id>/publish", methods=["POST"])
 @login_required
 @role_required("teacher")
