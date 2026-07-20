@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Notes — UltraEdu{% endblock %}
+{% block content %}
+<h1>Notes &amp; Resources</h1>
+{% if resources %}
+<table class="simple-table">
+  <thead><tr><th>Title</th><th>Type</th><th>Subject</th><th></th></tr></thead>
+  <tbody>
+    {% for r in resources %}
+    <tr>
+      <td>{{ r.title }}</td>
+      <td>{{ r.resource_type|label }}</td>
+      <td><span class="subject-dot" style="background:{{ r.subject.color_hex }}"></span> {{ r.subject.name }}</td>
+      <td><a href="{{ url_for('api.serve_upload', relative_path=r.file_path) }}" target="_blank">Open</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No resources available yet.</p>
+{% endif %}
+{% endblock %}

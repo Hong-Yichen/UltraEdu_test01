@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}UltraEdu{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  {% if current_user.is_authenticated %}
+  <header class="app-header">
+    <a class="brand" href="{{ url_for('main.index') }}">
+      <img src="{{ url_for('static', filename='img/logo-icon.png') }}" class="brand-icon" alt="">
+      <span class="brand-word">Ultra<span class="brand-edu">Edu</span></span>
+    </a>
+    {% if current_user.is_teacher %}
+      {% include "components/_teacher_nav.html" %}
+    {% else %}
+      {% include "components/_student_nav.html" %}
+    {% endif %}
+    <div class="header-right">
+      <a href="{{ url_for(current_user.role ~ '.messages_list') }}" class="notif-bell" aria-label="Messages">
+        💬<span id="chat-count" class="notif-count" hidden>0</span>
+      </a>
+      <button id="notif-bell" class="notif-bell" type="button" aria-label="Notifications">
+        🔔<span id="notif-count" class="notif-count" hidden>0</span>
+      </button>
+      <div id="notif-panel" class="notif-panel" hidden></div>
+      <span class="current-user">
+        {{ current_user.full_name }}
+        <span class="role-badge {{ 'teacher' if current_user.is_teacher else 'student' }}">{{ 'Teacher' if current_user.is_teacher else 'Student' }}</span>
+      </span>
+      <form action="{{ url_for('auth.logout') }}" method="post" class="logout-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="link-button">Log out</button>
+      </form>
+    </div>
+  </header>
+  {% endif %}
+
+  <main class="app-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if current_user.is_authenticated %}
+  <script>window.CSRF_TOKEN = "{{ csrf_token() }}";</script>
+  <script src="{{ url_for('static', filename='js/notifications_poll.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/chat_badge_poll.js') }}"></script>
+  {% endif %}
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

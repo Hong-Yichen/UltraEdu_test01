@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Log in — UltraEdu{% endblock %}
+{% block content %}
+<div class="auth-shell">
+  <div class="auth-hero">
+    <img src="{{ url_for('static', filename='img/logo-full.png') }}" class="hero-mark-img" alt="UltraEdu — Learn More. Achieve More. Be More.">
+    <h1 class="sr-only">UltraEdu</h1>
+    <p class="tagline">A smarter, paperless learning platform — students write, not type.</p>
+    <ul class="hero-features">
+      <li><span class="feat-icon">✍️</span> Real handwriting &amp; drawing on digital worksheets</li>
+      <li><span class="feat-icon">🎯</span> Teacher-controlled AI hints — never full answers</li>
+      <li><span class="feat-icon">🔒</span> Exam Mode &amp; Classroom Lockdown built in</li>
+      <li><span class="feat-icon">📊</span> Progress tracking for students and teachers</li>
+    </ul>
+  </div>
+  <div class="auth-form-panel">
+    <h2>Welcome back</h2>
+    <p class="form-sub">Log in to your teacher or student account.</p>
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="field">
+        {{ form.email.label }}
+        {{ form.email(autofocus=true, autocomplete="username") }}
+      </div>
+      <div class="field">
+        {{ form.password.label }}
+        {{ form.password(autocomplete="current-password") }}
+      </div>
+      <div class="field field-inline">
+        {{ form.remember() }} {{ form.remember.label }}
+      </div>
+      {{ form.submit(class="btn-primary") }}
+    </form>
+    <div class="demo-accounts">
+      <strong>Demo accounts</strong><br>
+      Teacher (Math): teacher@ultraedu.app / teacher123<br>
+      Teacher (other subjects): teacher2@ultraedu.app / teacher123<br>
+      Student: student@ultraedu.app / student123<br>
+      Student (teammate): student2@ultraedu.app / student123
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% macro calendar_grid(year, month, month_name, weeks, day_map, today, prev_url, next_url, role) %}
+<div class="cal-header">
+  <a href="{{ prev_url }}" class="cal-nav">‹</a>
+  <h2>{{ month_name }} {{ year }}</h2>
+  <a href="{{ next_url }}" class="cal-nav">›</a>
+  {% if role == 'teacher' %}
+  <a href="{{ url_for('teacher.calendar_event_new') }}?date={{ today.isoformat() }}" class="btn-primary btn-inline cal-add-btn">+ New event</a>
+  {% endif %}
+</div>
+
+<div class="cal-grid">
+  {% for wd in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] %}
+  <div class="cal-weekday">{{ wd }}</div>
+  {% endfor %}
+
+  {% for week in weeks %}
+    {% for day in week %}
+    <div class="cal-day {{ 'other-month' if day.month != month else '' }} {{ 'is-today' if day == today else '' }}">
+      <div class="cal-day-number">{{ day.day }}</div>
+      {% for entry in day_map.get(day, [])[:3] %}
+        {% if entry.url %}
+        <a href="{{ entry.url }}" class="cal-chip chip-{{ entry.color }}">{{ entry.label }}</a>
+        {% else %}
+        <div class="cal-chip chip-{{ entry.color }}">{{ entry.label }}</div>
+        {% endif %}
+      {% endfor %}
+      {% if day_map.get(day, [])|length > 3 %}
+      <div class="cal-more">+{{ day_map.get(day)|length - 3 }} more</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% endfor %}
+</div>
+{% endmacro %}

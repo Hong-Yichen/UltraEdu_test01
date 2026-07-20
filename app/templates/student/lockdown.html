@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Classroom Lockdown — UltraEdu{% endblock %}
+{% block content %}
+{% if lockdown_session %}
+<div class="card">
+  <h1>🔒 Classroom Lockdown</h1>
+  <p>Your teacher has locked the classroom to {{ lockdown_session.subject.name }} for now. Other subjects, notes, and assignments are unavailable until it ends.</p>
+  <p><a href="{{ url_for('student.calculator') }}">Open calculator</a></p>
+</div>
+
+<div class="card">
+  <h2>{{ lockdown_session.subject.name }} Assignments</h2>
+  {% if assignments %}
+  <ul class="plain-list">
+    {% for a in assignments %}
+    <li><a href="{{ url_for('student.assignment_detail', assignment_id=a.id) }}">{{ a.title }}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">No assignments available.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>Allowed Resources</h2>
+  {% if resources %}
+  <ul class="plain-list">
+    {% for r in resources %}
+    <li><a href="{{ url_for('api.serve_upload', relative_path=r.file_path) }}" target="_blank">{{ r.title }}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">No additional resources allowed.</p>
+  {% endif %}
+</div>
+{% else %}
+<div class="card">
+  <h1>No lockdown in progress</h1>
+  <p><a href="{{ url_for('student.dashboard') }}">Return to dashboard</a></p>
+</div>
+{% endif %}
+{% endblock %}

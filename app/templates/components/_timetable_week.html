@@ -1,0 +1,42 @@
+{% macro timetable_week(periods, grid, day_names) %}
+<div class="card accent-sky timetable-week-card">
+  <h2><span class="card-icon sky">🗓️</span> Weekly Timetable</h2>
+  {% if periods %}
+  <div class="timetable-week-scroll">
+    <table class="simple-table timetable-week">
+      <thead>
+        <tr>
+          <th>Period</th>
+          {% for name in day_names %}<th>{{ name }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for number, start, end in periods %}
+        <tr>
+          <td class="tt-period">
+            <strong>P{{ number }}</strong><br>
+            <span class="muted">{{ start.strftime('%H:%M') }}–{{ end.strftime('%H:%M') }}</span>
+          </td>
+          {% for day_index in range(day_names|length) %}
+          {% set entry = grid.get(number, {}).get(day_index) %}
+          <td>
+            {% if entry %}
+            <div class="tt-cell" style="border-left-color:{{ entry.class_group.subject.color_hex }}">
+              <span class="tt-subject">{{ entry.class_group.subject.name }}</span>
+              {% if entry.room %}<span class="muted tt-room">{{ entry.room }}</span>{% endif %}
+            </div>
+            {% else %}
+            <span class="muted">—</span>
+            {% endif %}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">No timetable entries yet.</p>
+  {% endif %}
+</div>
+{% endmacro %}

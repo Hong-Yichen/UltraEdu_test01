@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Examinations — UltraEdu{% endblock %}
+{% block content %}
+<h1>Examinations</h1>
+<p class="muted">Publishing an examination automatically turns on Exam Mode for the class and keeps AI hints off.</p>
+<p><a href="{{ url_for('teacher.examinations_new') }}" class="btn-primary btn-inline">New examination</a></p>
+{% if examinations %}
+<table class="simple-table">
+  <thead><tr><th>Title</th><th>Class</th><th>Difficulty</th><th>Status</th><th>Due</th></tr></thead>
+  <tbody>
+    {% for a in examinations %}
+    <tr>
+      <td><a href="{{ url_for('teacher.examination_detail', assignment_id=a.id) }}">{{ a.title }}</a></td>
+      <td>{{ a.class_group.name }}</td>
+      <td>{{ a.difficulty|label }}</td>
+      <td>
+        {% if not a.is_published %}Draft
+        {% elif a.exam_mode_enabled %}<span class="status-badge status-submitted">Exam Mode active</span>
+        {% else %}Published
+        {% endif %}
+      </td>
+      <td>{{ a.due_date.strftime('%d %b %Y') if a.due_date else '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No examinations yet.</p>
+{% endif %}
+{% endblock %}

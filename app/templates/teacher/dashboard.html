@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% from "components/_timetable_today.html" import timetable_today %}
+{% block title %}Teacher Dashboard — UltraEdu{% endblock %}
+{% block content %}
+<div class="welcome-banner">
+  <h1>Welcome back, {{ current_user.full_name }} 👋</h1>
+  <p>Here's what's happening across your classes today.</p>
+</div>
+
+{{ timetable_today(today_timetable) }}
+
+<div class="card accent-indigo">
+  <h2><span class="card-icon indigo">🏫</span> Your Classes</h2>
+  {% if classes %}
+  <ul class="plain-list">
+    {% for c in classes %}
+    <li>
+      <span class="subject-dot" style="background:{{ c.subject.color_hex }}"></span> {{ c.name }}
+      <span class="muted">({{ c.subject.name }})</span> ·
+      <a href="{{ url_for('teacher.lockdown_control', class_group_id=c.id) }}">Lockdown</a> ·
+      <a href="{{ url_for('teacher.class_analytics', class_group_id=c.id) }}">Analytics</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">No classes yet.</p>
+  {% endif %}
+</div>
+
+<div class="card-grid">
+  <div class="card accent-coral">
+    <h2><span class="card-icon coral">📝</span> Assignments to grade</h2>
+    {% if to_grade %}
+    <ul class="plain-list">
+      {% for s in to_grade %}
+      <li><a href="{{ url_for('teacher.grade_submission', submission_id=s.id) }}">{{ s.assignment.title }} — {{ s.student.full_name if s.student else 'Group' }}</a></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">Nothing to grade right now.</p>
+    {% endif %}
+  </div>
+  <div class="card accent-violet">
+    <h2><span class="card-icon violet">📢</span> Recent announcements</h2>
+    {% if recent_announcements %}
+    <ul class="plain-list">
+      {% for a in recent_announcements %}
+      <li>{{ a.title }}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">No announcements yet.</p>
+    {% endif %}
+  </div>
+  <div class="card accent-amber">
+    <h2><span class="card-icon amber">🎓</span> Upcoming exams</h2>
+    {% if upcoming_exams %}
+    <ul class="plain-list">
+      {% for a in upcoming_exams %}
+      <li><a href="{{ url_for('teacher.assignment_detail', assignment_id=a.id) }}">{{ a.title }}</a></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">None scheduled.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

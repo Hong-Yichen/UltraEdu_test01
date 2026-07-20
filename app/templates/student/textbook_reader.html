@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}{{ textbook.title }} — UltraEdu{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">
+<style>
+  .tb-layout { display: flex; gap: 1.2rem; align-items: flex-start; }
+  .tb-viewer { flex: 1; min-width: 0; overflow-x: auto; }
+  .tb-page-nav { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.6rem; }
+  .tb-page-nav button { padding: 0.35rem 0.9rem; }
+  .tb-page-container { position: relative; display: inline-block; box-shadow: var(--shadow-soft); }
+  .tb-page-container canvas.tb-pdf-canvas { display: block; border: 1px solid var(--border); }
+  .tb-annotation-mount { position: absolute; top: 0; left: 0; }
+  .uec-transparent-overlay.uec-container {
+    background: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+  }
+  .tb-notes-panel {
+    width: 320px; flex-shrink: 0; background: var(--paper); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1rem; max-height: 82vh; overflow-y: auto;
+  }
+  .tb-notes-panel h2 { margin-top: 0; font-size: 1rem; }
+  .tb-note-form .field { margin-bottom: 0.6rem; }
+  .tb-note-form input[type="number"] { width: 100px; }
+  .tb-note-item {
+    background: #fdf9e9; border: 1px solid #f0e5b8; border-radius: 8px;
+    padding: 0.6rem 0.7rem; margin-bottom: 0.6rem; font-size: 0.85rem;
+  }
+  .tb-note-page { font-weight: 700; color: var(--brand-amber); font-size: 0.75rem; text-transform: uppercase; }
+  .tb-note-body { white-space: pre-wrap; margin: 0.2rem 0; }
+  .tb-note-delete { font-size: 0.72rem; }
+  @media (max-width: 900px) {
+    .tb-layout { flex-direction: column; }
+    .tb-notes-panel { width: 100%; }
+  }
+</style>
+{% endblock %}
+{% block content %}
+<h1>{{ textbook.title }}</h1>
+<p class="muted">{{ textbook.subject.name }}{% if textbook.description %} · {{ textbook.description }}{% endif %}</p>
+<p class="muted">✍️ Draw, highlight, underline, and add sticky notes right on the page — your marks are saved automatically.</p>
+
+<div class="tb-layout">
+  <div class="tb-viewer">
+    <div class="tb-page-nav">
+      <button type="button" id="tb-prev-page" class="btn-primary btn-inline">‹ Prev</button>
+      <span id="tb-page-label" class="muted">Loading…</span>
+      <button type="button" id="tb-next-page" class="btn-primary btn-inline">Next ›</button>
+    </div>
+    <div id="tb-reader-root" data-textbook-id="{{ textbook.id }}"
+         data-pdf-url="{{ url_for('api.serve_upload', relative_path=textbook.file_path) }}">
+      <div id="tb-page-container" class="tb-page-container">
+        <canvas id="tb-pdf-canvas" class="tb-pdf-canvas"></canvas>
+        <div id="tb-annotation-mount" class="tb-annotation-mount uec-transparent-overlay"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tb-notes-panel">
+    <h2>📝 My Notes</h2>
+    <form method="post" action="{{ url_for('student.textbook_note_create', textbook_id=textbook.id) }}" class="tb-note-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field">
+        <label for="page_number">Page (optional)</label>
+        <input type="number" id="page_number" name="page_number" min="1">
+      </div>
+      <div class="field">
+        <label for="body">Note</label>
+        <textarea id="body" name="body" rows="3" required placeholder="Write what you want to remember…"></textarea>
+      </div>
+      <button type="submit" class="btn-primary">Add note</button>
+    </form>
+
+    <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--border);">
+
+    {% if notes %}
+    {% for n in notes %}
+    <div class="tb-note-item">
+      {% if n.page_number %}<div class="tb-note-page">Page {{ n.page_number }}</div>{% endif %}
+      <p class="tb-note-body">{{ n.body }}</p>
+      <form method="post" action="{{ url_for('student.textbook_note_delete', textbook_id=textbook.id, note_id=n.id) }}"
+            onsubmit="return confirm('Delete this note?');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="link-button tb-note-delete">Delete</button>
+      </form>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="muted">No notes yet — add one while you read.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>window.CSRF_TOKEN = "{{ csrf_token() }}";</script>
+<script src="{{ url_for('static', filename='js/canvas.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="{{ url_for('static', filename='js/textbook_reader.js') }}"></script>
+{% endblock %}

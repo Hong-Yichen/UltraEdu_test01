@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Exam in progress — UltraEdu{% endblock %}
+{% block content %}
+{% if exam_session %}
+<div class="card">
+  <h1>🔒 Exam Mode</h1>
+  <p>You're currently in an exam. Notes, storybooks, other assignments, and AI hints are unavailable until it ends.</p>
+  <p><a href="{{ url_for('student.assignment_detail', assignment_id=exam_session.assignment_id) }}" class="btn-primary btn-inline">Go to your exam</a></p>
+</div>
+{% else %}
+<div class="card">
+  <h1>No exam in progress</h1>
+  <p><a href="{{ url_for('student.dashboard') }}">Return to dashboard</a></p>
+</div>
+{% endif %}
+{% endblock %}

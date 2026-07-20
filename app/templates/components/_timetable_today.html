@@ -1,0 +1,22 @@
+{% macro timetable_today(entries) %}
+<div class="card accent-sky">
+  <h2><span class="card-icon sky">🕐</span> Today's Timetable</h2>
+  {% if entries %}
+  <table class="simple-table">
+    <thead><tr><th>Period</th><th>Time</th><th>Subject</th><th>Room</th></tr></thead>
+    <tbody>
+      {% for t in entries %}
+      <tr>
+        <td>{{ t.period_number }}</td>
+        <td>{{ t.start_time.strftime('%H:%M') }}–{{ t.end_time.strftime('%H:%M') }}</td>
+        <td>{{ t.class_group.subject.name }}</td>
+        <td>{{ t.room or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No lessons scheduled today.</p>
+  {% endif %}
+</div>
+{% endmacro %}

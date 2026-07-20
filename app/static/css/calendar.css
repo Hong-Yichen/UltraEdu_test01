@@ -1,0 +1,48 @@
+.cal-header {
+  display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem;
+}
+.cal-header h2 { margin: 0; font-size: 1.3rem; min-width: 200px; }
+.cal-nav {
+  width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center;
+  justify-content: center; background: var(--paper); border: 1px solid var(--border);
+  text-decoration: none; color: var(--ink); font-size: 1.1rem;
+}
+.cal-nav:hover { background: #eef0fc; color: var(--brand-indigo); }
+.cal-add-btn { margin-left: auto; }
+
+.cal-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  background: var(--border);
+  gap: 1px;
+}
+.cal-weekday {
+  background: var(--paper); text-align: center; font-size: 0.75rem; font-weight: 700;
+  text-transform: uppercase; color: #888; padding: 0.5rem 0;
+}
+.cal-day {
+  background: #fff; min-height: 96px; padding: 0.4rem; display: flex; flex-direction: column; gap: 0.2rem;
+}
+.cal-day.other-month { background: #fafafd; }
+.cal-day.other-month .cal-day-number { color: #ccc; }
+.cal-day.is-today { background: #f6f5fd; }
+.cal-day.is-today .cal-day-number {
+  background: var(--brand-gradient); color: white; border-radius: 50%;
+  width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+}
+.cal-day-number { font-size: 0.8rem; font-weight: 600; color: #555; }
+.cal-chip {
+  font-size: 0.68rem; padding: 1px 5px; border-radius: 5px; color: white;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; display: block;
+}
+.cal-chip.chip-violet { background: var(--brand-violet); }
+.cal-chip.chip-teal { background: var(--brand-teal); }
+.cal-chip.chip-coral { background: var(--brand-coral); }
+.cal-chip.chip-amber { background: var(--brand-amber); }
+.cal-chip.chip-sky { background: var(--brand-sky); }
+.cal-more { font-size: 0.65rem; color: #999; }
+
+@media (max-width: 700px) {
+  .cal-day { min-height: 64px; }
+  .cal-header h2 { font-size: 1.05rem; min-width: 0; }
+}

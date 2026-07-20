@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}New Assignment — UltraEdu{% endblock %}
+{% block content %}
+<h1>New Assignment</h1>
+<form method="post" class="form-card">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="field">
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" required>
+  </div>
+  <div class="field">
+    <label for="description">Description</label>
+    <textarea id="description" name="description" rows="3"></textarea>
+  </div>
+  <div class="field">
+    <label for="class_group_id">Class</label>
+    <select id="class_group_id" name="class_group_id" required>
+      {% for c in classes %}
+      <option value="{{ c.id }}">{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="worksheet_id">Worksheet (optional — leave blank for a file-upload assignment)</label>
+    <select id="worksheet_id" name="worksheet_id">
+      <option value="">— None (file upload) —</option>
+      {% for w in worksheets %}
+      <option value="{{ w.id }}">{{ w.title }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="difficulty">Difficulty</label>
+    <select id="difficulty" name="difficulty">
+      {% for d in difficulties %}
+      <option value="{{ d }}" {% if d == 'medium' %}selected{% endif %}>{{ d|label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="ai_mode">AI Assistance</label>
+    <select id="ai_mode" name="ai_mode">
+      {% for m in ai_modes %}
+      <option value="{{ m }}">{{ m|label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="due_date">Due date</label>
+    <input type="datetime-local" id="due_date" name="due_date">
+  </div>
+  <div class="field">
+    <label for="max_score">Max score</label>
+    <input type="number" id="max_score" name="max_score" value="10" min="0">
+  </div>
+  <div class="field field-inline">
+    <input type="checkbox" id="allow_image_upload" name="allow_image_upload">
+    <label for="allow_image_upload">Allow image upload sections</label>
+  </div>
+  <div class="field field-inline">
+    <input type="checkbox" id="allow_file_attachment" name="allow_file_attachment">
+    <label for="allow_file_attachment">Allow file attachments from students</label>
+  </div>
+  <div class="field field-inline">
+    <input type="checkbox" id="is_group_assignment" name="is_group_assignment">
+    <label for="is_group_assignment">Group project — students work together in teams</label>
+  </div>
+  <p class="muted">If this is a group project, you'll choose which students work together on the next page.</p>
+  <button type="submit" class="btn-primary">Create assignment</button>
+</form>
+{% endblock %}

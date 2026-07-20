@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "worksheet/_worksheet_page.html" import render_worksheet %}
+{% block title %}{{ storybook.title }} — UltraEdu{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/worksheet.css') }}">
+{% endblock %}
+{% block content %}
+<h1>{{ storybook.title }}</h1>
+<p class="muted">{{ storybook.language|label }} · {{ storybook.subject.name }}</p>
+
+<div class="card">
+  {% for page in storybook.pages %}
+  <div class="storybook-page">
+    <p>{{ page.text_content }}</p>
+    {% if page.image_path %}<img src="{{ url_for('api.serve_upload', relative_path=page.image_path) }}" style="max-width:100%;">{% endif %}
+  </div>
+  {% if not loop.last %}<hr>{% endif %}
+  {% endfor %}
+</div>
+
+{% if storybook.worksheet %}
+<h2>Activities</h2>
+<div id="ws-take-root" data-storybook-id="{{ storybook.id }}">
+  {{ render_worksheet(storybook.worksheet, answers_by_element, 'take', ai_enabled=(storybook.ai_mode == 'hints_only'), storybook_id=storybook.id) }}
+</div>
+{% endif %}
+{% endblock %}
+{% block extra_js %}
+<script>window.CSRF_TOKEN = "{{ csrf_token() }}";</script>
+<script src="{{ url_for('static', filename='js/canvas.js') }}"></script>
+{% if storybook.worksheet %}
+<script src="{{ url_for('static', filename='js/autosave.js') }}"></script>
+{% endif %}
+{% endblock %}

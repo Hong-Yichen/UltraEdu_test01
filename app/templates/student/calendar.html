@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% from "components/_calendar_grid.html" import calendar_grid %}
+{% block title %}Calendar — UltraEdu{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
+{% endblock %}
+{% block content %}
+<h1>School Calendar</h1>
+{{ calendar_grid(year, month, month_name, weeks, day_map, today, prev_url, next_url, 'student') }}
+{% endblock %}

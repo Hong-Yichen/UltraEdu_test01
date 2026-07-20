@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Analytics — {{ assignment.title }} — UltraEdu{% endblock %}
+{% block content %}
+<h1>Analytics — {{ assignment.title }}</h1>
+<p class="muted"><a href="{{ url_for('teacher.assignment_detail', assignment_id=assignment.id) }}">‹ Back to assignment</a></p>
+
+<div class="card-grid">
+  <div class="card accent-teal">
+    <h2><span class="card-icon teal">✅</span> Submitted</h2>
+    <p style="font-size:1.6rem; font-weight:700; margin:0;">{{ submitted_count }} / {{ total_students }}</p>
+  </div>
+  <div class="card accent-coral">
+    <h2><span class="card-icon coral">⏳</span> Not submitted</h2>
+    <p style="font-size:1.6rem; font-weight:700; margin:0;">{{ not_submitted_count }} / {{ total_students }}</p>
+  </div>
+  <div class="card accent-indigo">
+    <h2><span class="card-icon indigo">📊</span> Average score</h2>
+    <p style="font-size:1.6rem; font-weight:700; margin:0;">{{ average if average is not none else '—' }}{{ '%' if average is not none }}</p>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Grade distribution</h2>
+  <table class="simple-table">
+    <thead><tr><th>Range</th><th>Count</th></tr></thead>
+    <tbody>
+      {% for range, count in buckets.items() %}
+      <tr><td>{{ range }}</td><td>{{ count }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Every student</h2>
+  {% if per_student %}
+  <table class="simple-table">
+    <thead><tr><th>Student</th><th>Status</th><th>Submitted</th><th>Grade</th></tr></thead>
+    <tbody>
+      {% for row in per_student %}
+      <tr>
+        <td>{{ row.student.full_name }}</td>
+        <td>
+          {% if row.status == 'not_started' %}
+          <span class="status-badge status-not_started">Not submitted</span>
+          {% elif row.status == 'in_progress' %}
+          <span class="status-badge status-in_progress">In progress</span>
+          {% else %}
+          <span class="status-badge status-{{ row.status }}">{{ row.status|label }}</span>
+          {% endif %}
+        </td>
+        <td>{{ row.submitted_at.strftime('%d %b %Y %H:%M') if row.submitted_at else '—' }}</td>
+        <td>
+          {% if row.score is not none %}
+          {{ row.score }} / {{ row.max_score }}
+          {% if row.submission %}<a href="{{ url_for('teacher.grade_submission', submission_id=row.submission.id) }}" style="margin-left:0.4rem;">view</a>{% endif %}
+          {% elif row.has_submitted and row.submission %}
+          <a href="{{ url_for('teacher.grade_submission', submission_id=row.submission.id) }}">Grade now</a>
+          {% else %}
+          <span class="muted">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No students enrolled in this class yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Planner — UltraEdu{% endblock %}
+{% block content %}
+<h1>Homework Planner</h1>
+<div class="card-grid">
+  <div class="card">
+    <h2>Due today</h2>
+    {% if due_today %}
+    <ul class="plain-list">{% for a in due_today %}<li><a href="{{ url_for('student.assignment_detail', assignment_id=a.id) }}">{{ a.title }}</a></li>{% endfor %}</ul>
+    {% else %}<p class="muted">Nothing due today.</p>{% endif %}
+  </div>
+  <div class="card">
+    <h2>Due this week</h2>
+    {% if due_this_week %}
+    <ul class="plain-list">{% for a in due_this_week %}<li><a href="{{ url_for('student.assignment_detail', assignment_id=a.id) }}">{{ a.title }}</a> <span class="muted">({{ a.due_date.strftime('%d %b') }})</span></li>{% endfor %}</ul>
+    {% else %}<p class="muted">Nothing due this week.</p>{% endif %}
+  </div>
+  <div class="card">
+    <h2>Upcoming projects</h2>
+    {% if upcoming_projects %}
+    <ul class="plain-list">{% for a in upcoming_projects %}<li><a href="{{ url_for('student.assignment_detail', assignment_id=a.id) }}">{{ a.title }}</a></li>{% endfor %}</ul>
+    {% else %}<p class="muted">None.</p>{% endif %}
+  </div>
+  <div class="card">
+    <h2>Upcoming exams</h2>
+    {% if upcoming_exams %}
+    <ul class="plain-list">{% for a in upcoming_exams %}<li><a href="{{ url_for('student.assignment_detail', assignment_id=a.id) }}">{{ a.title }}</a></li>{% endfor %}</ul>
+    {% else %}<p class="muted">None.</p>{% endif %}
+  </div>
+</div>
+{% endblock %}

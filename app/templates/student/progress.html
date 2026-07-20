@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Progress — UltraEdu{% endblock %}
+{% block content %}
+<h1>My Progress</h1>
+<div class="card-grid">
+  <div class="card"><h2>Overall grade</h2><p>{{ overall_pct if overall_pct is not none else '—' }}%</p></div>
+  <div class="card"><h2>Completed</h2><p>{{ completed_count }}</p></div>
+  <div class="card"><h2>Pending</h2><p>{{ pending_count }}</p></div>
+</div>
+
+<div class="card">
+  <h2>Subject progress</h2>
+  {% if subject_progress %}
+  <table class="simple-table">
+    <thead><tr><th>Subject</th><th>Completed</th></tr></thead>
+    <tbody>
+      {% for name, entry in subject_progress.items() %}
+      <tr><td>{{ name }}</td><td>{{ entry.completed }} / {{ entry.total }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No assignments yet.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>Upcoming deadlines</h2>
+  {% if upcoming %}
+  <ul class="plain-list">
+    {% for a in upcoming %}
+    <li><a href="{{ url_for('student.assignment_detail', assignment_id=a.id) }}">{{ a.title }}</a> <span class="muted">({{ a.due_date.strftime('%d %b %Y') }})</span></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">Nothing upcoming.</p>
+  {% endif %}
+</div>
+{% endblock %}

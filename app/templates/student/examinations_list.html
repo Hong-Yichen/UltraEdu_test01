@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Examinations — UltraEdu{% endblock %}
+{% block content %}
+<h1>Examinations</h1>
+<p class="muted">Opening an active examination turns on Exam Mode — you won't be able to use AI hints or leave until you submit.</p>
+{% if examinations %}
+<table class="simple-table">
+  <thead><tr><th>Title</th><th>Difficulty</th><th>Status</th><th>Due</th></tr></thead>
+  <tbody>
+    {% for a in examinations %}
+    {% set submission = submission_by_assignment.get(a.id) %}
+    <tr>
+      <td><a href="{{ url_for('student.assignment_detail', assignment_id=a.id) }}">{{ a.title }}</a></td>
+      <td>{{ a.difficulty|label }}</td>
+      <td>{{ submission.status|label if submission else 'Not Started' }}</td>
+      <td>{{ a.due_date.strftime('%d %b %Y') if a.due_date else '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No examinations scheduled yet.</p>
+{% endif %}
+{% endblock %}

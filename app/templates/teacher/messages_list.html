@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Messages — UltraEdu{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+{% endblock %}
+{% block content %}
+<h1>Messages</h1>
+<p class="muted">Direct messages with students in your classes.</p>
+
+{% if rows %}
+<div class="card" style="padding: 0.5rem;">
+  {% for row in rows %}
+  <a class="chat-list-item" href="{{ url_for('teacher.message_thread', student_id=row.student.id) }}">
+    <span class="chat-avatar">{{ row.student.full_name[0] }}</span>
+    <span>
+      <div class="chat-list-name">{{ row.student.full_name }}</div>
+      <div class="chat-list-preview">
+        {% if row.conversation.messages %}{{ row.conversation.messages[-1].body[:60] }}{% endif %}
+      </div>
+    </span>
+    {% if row.unread %}<span class="chat-unread-badge">{{ row.unread }}</span>{% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p class="muted">No conversations yet.</p>
+{% endif %}
+
+{% if new_contacts %}
+<div class="card">
+  <h2>Message a student</h2>
+  <ul class="plain-list">
+    {% for s in new_contacts %}
+    <li><a href="{{ url_for('teacher.message_thread', student_id=s.id) }}">{{ s.full_name }}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if group_links %}
+<h2 style="margin-top:1.6rem;">Team Chat</h2>
+<p class="muted">See and reply to each group project's chat.</p>
+<div class="card" style="padding: 0.5rem;">
+  {% for link in group_links %}
+  <a class="chat-list-item" href="{{ url_for('teacher.assignment_groups', assignment_id=link.assignment.id) }}">
+    <span class="chat-avatar">👥</span>
+    <span>
+      <div class="chat-list-name">{{ link.group.name }}</div>
+      <div class="chat-list-preview">{{ link.assignment.title }}</div>
+    </span>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ examination.title }} — UltraEdu{% endblock %}
+{% block content %}
+<h1>{{ examination.title }}</h1>
+<p class="muted">
+  {{ examination.class_group.name }} · {{ examination.difficulty|label }} ·
+  {{ 'Published' if examination.is_published else 'Draft' }} ·
+  Due {{ examination.due_date.strftime('%d %b %Y %H:%M') if examination.due_date else 'no due date' }}
+</p>
+{% if examination.description %}<p>{{ examination.description }}</p>{% endif %}
+<p>
+  {% if examination.worksheet %}
+  <a href="{{ url_for('teacher.assignment_model_answers', assignment_id=examination.id) }}">Model answers</a> ·
+  {% endif %}
+  <a href="{{ url_for('teacher.assignment_analytics', assignment_id=examination.id) }}">Analytics</a>
+</p>
+
+{% if not examination.is_published %}
+<form method="post" action="{{ url_for('teacher.examination_publish', assignment_id=examination.id) }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button type="submit" class="btn-primary btn-inline">Publish &amp; start Exam Mode</button>
+</form>
+{% elif exam_is_active %}
+<div class="card accent-amber">
+  <h2>🔒 Exam Mode is active</h2>
+  <p class="muted">Students in this class can currently only access this examination — AI hints, notes, storybooks and other assignments are hidden.</p>
+  <form method="post" action="{{ url_for('teacher.examination_end', assignment_id=examination.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn-danger">End Examination</button>
+  </form>
+</div>
+{% else %}
+<p class="muted">This examination has ended. Students have normal access again.</p>
+{% endif %}
+
+<div class="card">
+  <h2>
+    Submissions ({{ submissions|length }} / {{ total_students }})
+    {% set to_grade_count = submissions|selectattr('status', 'equalto', 'submitted')|list|length %}
+    {% if to_grade_count %}<span class="status-badge status-submitted" style="margin-left: 0.5rem;">{{ to_grade_count }} to grade</span>{% endif %}
+  </h2>
+  {% if submissions %}
+  <table class="simple-table">
+    <thead><tr><th>Student</th><th>Status</th><th>Submitted</th><th>Score</th><th></th></tr></thead>
+    <tbody>
+      {% for s in submissions %}
+      <tr>
+        <td>{{ s.student.full_name if s.student else '—' }}</td>
+        <td><span class="status-badge status-{{ s.status }}">{{ s.status|label }}</span></td>
+        <td>{{ s.submitted_at.strftime('%d %b %Y %H:%M') if s.submitted_at else '—' }}</td>
+        <td>{{ s.score if s.score is not none else '—' }} / {{ s.max_score }}</td>
+        <td>
+          {% if s.status in ('submitted', 'graded', 'returned', 'needs_revision') %}
+          <a href="{{ url_for('teacher.grade_submission', submission_id=s.id) }}">
+            {{ 'Grade' if s.status == 'submitted' else 'View grade' }}
+          </a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No submissions yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

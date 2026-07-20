@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Calculator — UltraEdu{% endblock %}
+{% block extra_css %}
+<style>
+  .calc { max-width: 260px; background: var(--paper); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+  .calc-display { width: 100%; box-sizing: border-box; font-size: 1.4rem; text-align: right; padding: 0.5rem; margin-bottom: 0.6rem; border: 1px solid var(--border); border-radius: 6px; }
+  .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; }
+  .calc-grid button { padding: 0.7rem 0; font-size: 1rem; border: 1px solid var(--border); border-radius: 6px; background: white; cursor: pointer; }
+  .calc-grid button:hover { background: #f1f6f2; }
+</style>
+{% endblock %}
+{% block content %}
+<h1>Calculator</h1>
+<div class="calc">
+  <input type="text" id="calc-display" class="calc-display" readonly value="0">
+  <div class="calc-grid">
+    <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button><button data-k="/">÷</button>
+    <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button><button data-k="*">×</button>
+    <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button><button data-k="-">−</button>
+    <button data-k="0">0</button><button data-k=".">.</button><button data-k="c">C</button><button data-k="+">+</button>
+    <button data-k="=" style="grid-column: span 4;">=</button>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+(function () {
+  const display = document.getElementById('calc-display');
+  let expr = '';
+  document.querySelectorAll('.calc-grid button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const k = btn.dataset.k;
+      if (k === 'c') { expr = ''; display.value = '0'; return; }
+      if (k === '=') {
+        try {
+          if (!/^[0-9+\-*/.\s]+$/.test(expr)) throw new Error('invalid');
+          display.value = String(Function('"use strict";return (' + expr + ')')());
+          expr = display.value;
+        } catch (e) { display.value = 'Error'; expr = ''; }
+        return;
+      }
+      expr += k;
+      display.value = expr;
+    });
+  });
+})();
+</script>
+{% endblock %}

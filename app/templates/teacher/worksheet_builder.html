@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ worksheet.title }} — Builder — UltraEdu{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/worksheet.css') }}">
+{% endblock %}
+{% block content %}
+<h1>{{ worksheet.title }}</h1>
+<p class="muted">{{ worksheet.subject.name }} · {{ worksheet.page_width }}×{{ worksheet.page_height }}px</p>
+
+<script id="ws-elements-data" type="application/json">{{ elements_json | safe }}</script>
+<div
+  id="ws-builder"
+  class="builder-layout"
+  data-worksheet-id="{{ worksheet.id }}"
+  data-page-width="{{ worksheet.page_width }}"
+  data-page-height="{{ worksheet.page_height }}"
+>
+  <div class="builder-toolbox">
+    <h3>Add element</h3>
+    {% for t in element_types %}
+    <button type="button" class="ws-add-btn" data-type="{{ t }}">{{ t|label }}</button>
+    {% endfor %}
+  </div>
+
+  <div class="builder-canvas-wrap">
+    <div id="ws-page" class="worksheet-page"></div>
+  </div>
+
+  <div class="builder-inspector-wrap">
+    <div id="ws-inspector-empty" class="card"><p class="muted">Select an element to edit it.</p></div>
+    <div id="ws-inspector" class="builder-inspector" hidden></div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>window.CSRF_TOKEN = "{{ csrf_token() }}";</script>
+<script src="{{ url_for('static', filename='js/worksheet_builder.js') }}"></script>
+{% endblock %}

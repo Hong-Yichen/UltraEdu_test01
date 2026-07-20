@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Messages — UltraEdu{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+{% endblock %}
+{% block content %}
+<h1>Messages</h1>
+<p class="muted">Ask your teachers a question directly. Messages are only between you and your teacher.</p>
+{% if rows %}
+<div class="card" style="padding: 0.5rem;">
+  {% for row in rows %}
+  <a class="chat-list-item" href="{{ url_for('student.message_thread', teacher_id=row.teacher.id) }}">
+    <span class="chat-avatar">{{ row.teacher.full_name[0] }}</span>
+    <span>
+      <div class="chat-list-name">{{ row.teacher.full_name }}</div>
+      <div class="chat-list-preview">
+        {% if row.conversation and row.conversation.messages %}
+          {{ row.conversation.messages[-1].body[:60] }}
+        {% else %}
+          Start a conversation
+        {% endif %}
+      </div>
+    </span>
+    {% if row.unread %}<span class="chat-unread-badge">{{ row.unread }}</span>{% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p class="muted">You don't have any teachers to message yet.</p>
+{% endif %}
+
+{% if group_links %}
+<h2 style="margin-top:1.6rem;">Team Chat</h2>
+<p class="muted">Message your teammates inside each group project's workspace.</p>
+<div class="card" style="padding: 0.5rem;">
+  {% for link in group_links %}
+  <a class="chat-list-item" href="{{ url_for('student.group_workspace', assignment_id=link.assignment.id) }}">
+    <span class="chat-avatar">👥</span>
+    <span>
+      <div class="chat-list-name">{{ link.group.name }}</div>
+      <div class="chat-list-preview">{{ link.assignment.title }}</div>
+    </span>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Storybooks — UltraEdu{% endblock %}
+{% block content %}
+<h1>Storybooks</h1>
+<p><a href="{{ url_for('teacher.storybooks_new') }}" class="btn-primary btn-inline">New storybook</a></p>
+{% if storybooks %}
+<table class="simple-table">
+  <thead><tr><th>Title</th><th>Language</th><th>Subject</th><th>Pages</th></tr></thead>
+  <tbody>
+    {% for s in storybooks %}
+    <tr>
+      <td><a href="{{ url_for('teacher.storybook_edit', storybook_id=s.id) }}">{{ s.title }}</a></td>
+      <td>{{ s.language|label }}</td>
+      <td>{{ s.subject.name }}</td>
+      <td>{{ s.pages|length }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No storybooks yet.</p>
+{% endif %}
+{% endblock %}
