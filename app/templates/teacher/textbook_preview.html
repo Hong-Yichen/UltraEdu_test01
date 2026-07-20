@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ textbook.title }} — UltraEdu{% endblock %}
+{% block extra_css %}
+<style>
+  .tbp-page-nav { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.6rem; }
+  .tbp-page-nav button { padding: 0.35rem 0.9rem; }
+  .tbp-page-container { display: inline-block; box-shadow: var(--shadow-soft); }
+  .tbp-page-container canvas { display: block; border: 1px solid var(--border); }
+</style>
+{% endblock %}
+{% block content %}
+<h1>{{ textbook.title }}</h1>
+<p class="muted">{{ textbook.subject.name }}{% if textbook.description %} · {{ textbook.description }}{% endif %}</p>
+<p class="muted"><a href="{{ url_for('teacher.textbooks_list') }}">← Back to textbooks</a></p>
+
+<div class="tbp-page-nav">
+  <button type="button" id="tbp-prev-page" class="btn-primary btn-inline">‹ Prev</button>
+  <span id="tbp-page-label" class="muted">Loading…</span>
+  <button type="button" id="tbp-next-page" class="btn-primary btn-inline">Next ›</button>
+</div>
+<div id="tbp-reader-root" data-pdf-url="{{ url_for('api.serve_upload', relative_path=textbook.file_path) }}">
+  <div class="tbp-page-container">
+    <canvas id="tbp-pdf-canvas"></canvas>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="{{ url_for('static', filename='js/textbook_preview.js') }}"></script>
+{% endblock %}
